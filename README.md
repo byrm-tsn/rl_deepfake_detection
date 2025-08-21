@@ -28,7 +28,7 @@ If you want to read my report, you can find it
 
 ## Usage
 
-1- Upload a video file through the web interface
+**1-** Upload a video file through the web interface
 2- Wait for processing (approximately 10 seconds)
 3- View detection results with confidence scores
 4- Examine DINOv3 attention heatmaps showing detection reasoning
