@@ -29,8 +29,8 @@ If you want to read my report, you can find it
 ## Usage
 
 - **Upload a video file through the web interface**
-- **Wait for processing (approximately 10 seconds)**
-- **View detection results with confidence scores**
+- **Wait for processing (approximately 10-15 seconds)**
+- **View detection results**
 - **Examine DINOv3 attention heatmaps showing detection reasoning**
 
 ## Model Architecture
