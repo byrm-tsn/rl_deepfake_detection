@@ -56,7 +56,7 @@ If you want to read my report, you can find it
 [![My Skills](https://skillicons.dev/icons?i=vscode,github,django,js,html,css,git,opencv,py,sqlite,pytorch,sklearn)](https://skillicons.dev)
 
 ## Clone the Repository
-###(You should train the model with the dataset you have, the model and dataset are not avaibale in repository!)
+### You should train the model with the dataset you have, the model and dataset are not avaibale in repository!)
 ```bash
 git clone https://https://github.com/byrm-tsn/rl_deepfake_detection
 cd rl_deepdake_detection
