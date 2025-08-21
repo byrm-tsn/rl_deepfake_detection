@@ -11,7 +11,13 @@ Watch the demo video below to see the application in action:
 
 https://github.com/user-attachments/assets/12063873-db85-49fc-8e0b-eb6f60f00c14
 
+## Model Architecture
 
+- **Feature Extraction**: DINOv3 Vision Transformer (ViT-B/16)
+- **Temporal Processing**: Bidirectional LSTM (3 layers, 512 hidden units)
+- **Decision Making**: Reinforcement Learning Agent with PPO and GRPO
+- **Uncertainty Estimation**: Bayesian inference via Monte Carlo Dropout
+  
 ## Features
 
 - **Intelligent Frame Selection**: Reinforcement learning agent analyzes only essential frames, reducing processing time to 10 seconds per video
@@ -33,12 +39,6 @@ If you want to read my report, you can find it
 - **View detection results**
 - **Examine DINOv3 attention heatmaps showing detection reasoning**
 
-## Model Architecture
-
-- **Feature Extraction**: DINOv3 Vision Transformer (ViT-B/16)
-- **Temporal Processing**: Bidirectional LSTM (3 layers, 512 hidden units)
-- **Decision Making**: Reinforcement Learning Agent with PPO and GRPO
-- **Uncertainty Estimation**: Bayesian inference via Monte Carlo Dropout
 
 ## Installation
 
