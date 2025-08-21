@@ -25,16 +25,30 @@ Watch the demo video below to see the application in action:
 
 If you want to read my report, you can find it 
 
+## Usage
+
+1- Upload a video file through the web interface
+2- Wait for processing (approximately 10 seconds)
+3- View detection results with confidence scores
+4- Examine DINOv3 attention heatmaps showing detection reasoning
+
+## Model Architecture
+
+- **Feature Extraction**: DINOv3 Vision Transformer (ViT-B/16)
+- **Temporal Processing**: Bidirectional LSTM (3 layers, 512 hidden units)
+- **Decision Making**: Reinforcement Learning Agent with PPO and GRPO
+- **Uncertainty Estimation**: Bayesian inference via Monte Carlo Dropout
+
 ## Installation
 
 ### Prerequisites
 
--Python 3.8+
--Django 4.2+
--PyTorch 2.0+
--TorchRL
--CUDA 11.8+
--cuDNN 8.6+
+-**Python 3.8+**
+-**Django 4.2+**
+-**PyTorch 2.0+**
+-**TorchRL**
+-**CUDA 11.8+**
+-**cuDNN 8.6+**
 
 ### Technologies Used
 
