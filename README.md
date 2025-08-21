@@ -1,4 +1,4 @@
-# EAGER - Deepfake Detection Framework
+# EAGER - Efficient Adaptive Gated Evidence Retrieval for Deepfake Detection using Reinforcement Learning
 
 ## Overview
 
