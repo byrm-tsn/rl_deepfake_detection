@@ -19,7 +19,7 @@ EAGER is an advanced deepfake detection system that leverages reinforcement lear
 
 Watch the demo video below to see the application in action:
 
-https://github.com/byrm-tsn/deep_fake_detection/assets/57181763/7dbb2058-2cf7-4d6f-a50d-ab2e282658cc
+
 
 ## Documentation
 
