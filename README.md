@@ -5,6 +5,12 @@
 EAGER is an advanced deepfake detection system that leverages reinforcement learning with DINOv3 vision transformer and custom Group Relative Policy Optimization (GRPO). The framework achieves high accuracy while processing only 20% of video frames, deployed through a Django web interface for real-time detection.
 
 
+## Demo
+
+Watch the demo video below to see the application in action:
+
+https://github.com/user-attachments/assets/12063873-db85-49fc-8e0b-eb6f60f00c14
+
 
 ## Features
 
@@ -15,13 +21,6 @@ EAGER is an advanced deepfake detection system that leverages reinforcement lear
 - **Attention Visualization**: DINOv3 heatmaps showing facial regions contributing to detection decisions
 - **GPU Acceleration**: Utilizes PyTorch-GPU for faster processing
   
-## Demo
-
-Watch the demo video below to see the application in action:
-
-https://github.com/user-attachments/assets/12063873-db85-49fc-8e0b-eb6f60f00c14
-
-
 
 ## Documentation
 
