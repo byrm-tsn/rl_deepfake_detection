@@ -1,0 +1,338 @@
+<!-- detector/templates/detector/base.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Advanced AI-powered deepfake detection. Protect yourself from manipulated videos with state-of-the-art technology.">
+    <meta name="keywords" content="deepfake, AI, video analysis, detection, security">
+    <title>{% block title %}VerifAI - AI Video Authentication{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'detector/images/5.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'detector/images/5.png' %}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Pro -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'detector/css/style.css' %}?v=5.0">
+    
+    <!-- Preloader Styles -->
+    <style>
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .preloader.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loader {
+            position: relative;
+        }
+        
+        .loader-logo {
+            font-size: 3rem;
+            color: #6366f1;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .loader-text {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #6366f1;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body style="min-height: 100vh; display: flex; flex-direction: column;">
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="loader">
+            <i class="fas fa-shield-alt loader-logo"></i>
+            <div class="loader-text">Loading...</div>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'detector:home' %}">
+                <img src="{% static 'detector/images/5.png' %}" alt="VerifAI Logo" style="height: 50px; width: auto;">
+                <span>VerifAI</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'detector:home' %}">
+                            <i class="fas fa-home me-1"></i> <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'detector:upload' %}">
+                            <i class="fas fa-upload me-1"></i> <span>Upload</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'detector:history' %}">
+                            <i class="fas fa-history me-1"></i> <span>History</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'detector:about' %}">
+                            <i class="fas fa-info-circle me-1"></i> <span>About</span>
+                        </a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <a class="nav-link" href="https://github.com/byrm-tsn/rl_deepfake_detection" target="_blank" style="padding: 0.5rem;">
+                            <i class="fab fa-github" style="font-size: 1.9rem;"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages with Animation -->
+    {% if messages %}
+    <div class="container" style="margin-top: 100px; position: fixed; right: 20px; top: 80px; z-index: 1050; max-width: 400px;">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-lg" role="alert" 
+             style="border: none; border-radius: 12px; animation: slide-in-right 0.5s ease-out;">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-3" style="font-size: 1.5rem;"></i>
+                <div>
+                    <strong>{% if message.tags == 'success' %}Success!{% elif message.tags == 'error' %}Error!{% else %}Info{% endif %}</strong>
+                    <div>{{ message }}</div>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main style="flex: 1 0 auto;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="text-center mb-4">
+                <div class="d-flex align-items-center justify-content-center mb-3">
+                    <img src="{% static 'detector/images/5.png' %}" alt="VerifAI Logo" style="height: 50px; width: auto; margin-right: 1rem; filter: brightness(0) invert(1);">
+                    <h3 class="mb-0 text-white">VerifAI</h3>
+                </div>
+                <p style="color: rgba(255, 255, 255, 0.8); max-width: 600px; margin: 0 auto 2rem; font-size: 1.1rem;">
+                    Advanced AI-powered deepfake detection to protect you from video manipulation and misinformation.
+                </p>
+                
+                <!-- Social Links -->
+                <div class="social-links justify-content-center">
+                    <a href="https://github.com/byrm-tsn/rl_deepfake_detection" target="_blank" class="social-link"><i class="fab fa-github"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            
+            <hr style="border-color: rgba(255, 255, 255, 0.1); margin: 2rem 0;">
+            
+            <div class="text-center">
+                <p class="mb-0" style="color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;">
+                    &copy; 2025 VerifAI. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="btn-back-to-top" aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="{% static 'detector/js/main.js' %}"></script>
+    
+    <!-- Base Scripts -->
+    <script>
+        // Preloader
+        window.addEventListener('load', function() {
+            const preloader = document.querySelector('.preloader');
+            setTimeout(() => {
+                preloader.classList.add('fade-out');
+                setTimeout(() => preloader.remove(), 500);
+            }, 500);
+        });
+        
+        // Back to Top Button
+        const backToTopButton = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.style.display = 'flex';
+                backToTopButton.style.opacity = '1';
+            } else {
+                backToTopButton.style.opacity = '0';
+                setTimeout(() => {
+                    if (window.pageYOffset <= 300) {
+                        backToTopButton.style.display = 'none';
+                    }
+                }, 300);
+            }
+        });
+        
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Auto-hide messages
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                setTimeout(() => bsAlert.close(), 5000);
+            });
+        }, 1000);
+    </script>
+    
+    <style>
+        /* Enhanced Footer Styles */
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .social-link:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-left: 1rem;
+        }
+        
+        .footer-links a::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            padding-left: 1.5rem;
+        }
+        
+        .footer-links a:hover::before {
+            opacity: 1;
+        }
+        
+        /* Back to Top Button */
+        .btn-back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            opacity: 0;
+        }
+        
+        .btn-back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
+        }
+        
+        /* Alert Animation */
+        @keyframes slide-in-right {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

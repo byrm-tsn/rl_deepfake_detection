@@ -1,0 +1,493 @@
+<!-- detector/templates/detector/result.html -->
+{% extends 'detector/base.html' %}
+{% load static %}
+
+{% block title %}Analysis Result - VerifAI{% endblock %}
+
+{% block content %}
+<!-- Check if processing -->
+{% if processing %}
+<!-- Processing Animation -->
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="analysis-card text-center">
+                <h2 class="mb-4">Processing Video</h2>
+                
+                <!-- Loading Animation -->
+                <div class="mb-4">
+                    <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;" role="status">
+                        <span class="visually-hidden">Processing...</span>
+                    </div>
+                </div>
+                
+                <p class="lead mb-4">Your video is being analyzed by our AI model</p>
+                <p class="text-muted">This usually takes 5-10 seconds...</p>
+                
+                <!-- Progress Bar -->
+                <div class="progress mt-4" style="height: 30px;">
+                    <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                         role="progressbar" style="width: 10%;" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
+                        <span id="progress-text">Initializing...</span>
+                    </div>
+                </div>
+                
+                <div id="error-message" class="alert alert-danger mt-4" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const videoId = '{{ video.id }}';
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    const errorMessage = document.getElementById('error-message');
+    let progress = 10;
+    let checkInterval;
+    let progressInterval;
+    
+    // Start processing with the two-step approach
+    progressText.textContent = 'Starting processing...';
+    
+    // Call process_ajax to process the video
+    fetch('/process_ajax/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            video_id: videoId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Processing complete
+            progressBar.style.width = '100%';
+            progressText.textContent = 'Complete!';
+            clearInterval(progressInterval);
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        } else if (data.status === 'error') {
+            errorMessage.textContent = 'Error: ' + data.message;
+            errorMessage.style.display = 'block';
+            clearInterval(progressInterval);
+        }
+    })
+    .catch(error => {
+        console.error('Error processing:', error);
+        errorMessage.textContent = 'Error processing video';
+        errorMessage.style.display = 'block';
+        clearInterval(progressInterval);
+    });
+    
+    // Update progress bar
+    progressInterval = setInterval(() => {
+        if (progress < 90) {
+            progress += Math.random() * 15;
+            progress = Math.min(progress, 90);
+            progressBar.style.width = progress + '%';
+            progressBar.setAttribute('aria-valuenow', progress);
+            
+            if (progress < 30) {
+                progressText.textContent = 'Loading models...';
+            } else if (progress < 60) {
+                progressText.textContent = 'Extracting frames...';
+            } else {
+                progressText.textContent = 'Analyzing video...';
+            }
+        }
+    }, 500);
+});
+</script>
+
+<!-- Check if there's an error in the analysis -->
+{% elif result.detailed_analysis.error %}
+<!-- Error Hero -->
+<div class="result-hero" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); position: relative; z-index: 1;">
+    <div class="container text-center position-relative">
+        <i class="fas fa-exclamation-circle fa-5x mb-3 result-icon text-white"></i>
+        <h1 class="result-title text-white" style="font-size: 3rem; font-weight: 800; animation: slide-up 0.6s ease-out 0.3s both;">
+            ANALYSIS ERROR
+        </h1>
+        <p class="result-subtitle lead text-white" style="font-size: 1.5rem; animation: slide-up 0.6s ease-out 0.5s both;">
+            {{ result.detailed_analysis.error }}
+        </p>
+    </div>
+</div>
+{% else %}
+<!-- Result Hero with Animation -->
+<div class="result-hero {% if result.is_deepfake %}deepfake{% else %}authentic{% endif %}" style="position: relative; z-index: 1;">
+    <div class="container text-center position-relative">
+        <i class="{% if result.is_deepfake %}fas fa-exclamation-triangle{% else %}fas fa-check-shield{% endif %} fa-5x mb-3 result-icon text-white"></i>
+        <h1 class="result-title text-white" style="font-size: 3rem; font-weight: 800; animation: slide-up 0.6s ease-out 0.3s both;">
+            {% if result.is_deepfake %}DEEPFAKE DETECTED{% else %}AUTHENTIC VIDEO{% endif %}
+        </h1>
+        <p class="result-subtitle lead text-white" style="font-size: 1.5rem; animation: slide-up 0.6s ease-out 0.5s both;">
+            Analysis completed - Video is <span style="font-weight: 700;">{{ result_text }}</span>
+        </p>
+    </div>
+</div>
+
+<!-- Main Results Section -->
+<div class="container" style="margin-top: -30px; position: relative; z-index: 2;">
+    <div class="row">
+        <!-- Video Player -->
+        <div class="col-lg-6 mb-4">
+            <div class="analysis-card no-hover" style="padding: 0; overflow: hidden;">
+                <div style="position: relative;">
+                    <video controls width="100%" style="display: block;">
+                        <source src="{{ video.video_file.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <!-- Overlay Gradient -->
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 100px; background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent); pointer-events: none;"></div>
+                </div>
+                
+                <div class="p-4">
+                    <div class="d-flex flex-wrap gap-3 text-muted mb-3">
+                        <span><i class="fas fa-calendar-alt me-2"></i>{{ result.created_at|date:"F d, Y" }}</span>
+                        <span><i class="fas fa-clock me-2"></i>{{ result.created_at|time:"g:i A" }}</span>
+                        <span><i class="fas fa-tachometer-alt me-2"></i>Processed in {{ result.processing_time|floatformat:2 }}s</span>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="shareResults()">
+                                <i class="fas fa-share me-1"></i>Share
+                            </button>
+                            <a href="{{ video.video_file.url }}" class="btn btn-outline-secondary btn-sm" download>
+                                <i class="fas fa-download me-1"></i>Download
+                            </a>
+                        </div>
+                        
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmDelete()">
+                            <i class="fas fa-trash me-1"></i>Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Result Card -->
+        <div class="col-lg-6 mb-4">
+            <div class="analysis-card text-center h-100 no-hover">
+                <h4 class="mb-3">Detection Result</h4>
+                
+                <!-- Result Icon -->
+                <div class="mb-3">
+                    <i class="{% if result.is_deepfake %}fas fa-times-circle{% else %}fas fa-check-circle{% endif %} fa-5x {% if result.is_deepfake %}text-danger{% else %}text-success{% endif %}" style="animation: pulse 2s infinite;"></i>
+                </div>
+                
+                <!-- Result Badge -->
+                <div class="p-3 rounded-3 {% if result.is_deepfake %}bg-danger bg-opacity-10{% else %}bg-success bg-opacity-10{% endif %}">
+                    <h3 class="mb-0 {% if result.is_deepfake %}text-danger{% else %}text-success{% endif %}">
+                        {{ result_text|upper }}
+                    </h3>
+                    <p class="mt-2 mb-0 text-muted">
+                        {% if result.is_deepfake %}
+                            This video has been manipulated using deepfake technology
+                        {% else %}
+                            This video is genuine and has not been manipulated
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Attention Heatmaps Section (Only for Deepfakes) -->
+    {% if result.is_deepfake %}
+        {% if heatmap_images %}
+        <div class="row mt-4">
+            <div class="col-12 mb-3 text-center">
+                <h4 style="font-weight: 700;">DINOv3 Attention Analysis</h4>
+                <p class="text-muted" style="font-size: 0.95rem;">Attention overlays showing where our AI detected deepfake artifacts</p>
+            </div>
+            
+            <!-- 2x2 Grid Layout for 4 frames -->
+            <div class="row justify-content-center">
+                {% for heatmap in heatmap_images %}
+                <div class="col-lg-5 col-md-6 mb-3">
+                    <div class="heatmap-card" style="background: white; border-radius: 14px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06); padding: 12px; transition: all 0.3s ease;" 
+                         onmouseover="this.style.boxShadow='0 6px 25px rgba(0, 0, 0, 0.12)'" 
+                         onmouseout="this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.06)'">
+                        <h6 class="mb-2 text-center text-muted" style="font-size: 0.9rem;">Frame {{ forloop.counter }}</h6>
+                        <img src="data:image/png;base64,{{ heatmap }}" class="img-fluid" style="width: 100%; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
+                        <p class="text-center text-muted mt-2 mb-0">
+                            <small style="font-size: 0.8rem;"><i class="fas fa-search me-1"></i>Attention overlay</small>
+                        </p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    {% else %}
+        <!-- Message for Authentic Videos -->
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <div class="authentic-message" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 20px; padding: 3rem; border: 2px solid #0ea5e9; border-style: dashed;">
+                    <div class="mb-4">
+                        <i class="fas fa-shield-check fa-4x text-primary"></i>
+                    </div>
+                    <h3 style="font-weight: 700; color: #0369a1;">Video is Authentic</h3>
+                    <p class="text-muted mt-3 mb-0" style="font-size: 1.1rem;">
+                        Since this video is genuine, no attention analysis is needed.<br>
+                        <small class="text-muted">Attention heatmaps are only generated when deepfake artifacts are detected.</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    
+    <!-- Privacy & Safety Section (Only for Deepfakes) -->
+    {% if result.is_deepfake %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="privacy-warning" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 20px; padding: 3rem; border: 2px solid #ef4444; border-style: dashed; text-align: center;">
+                <div class="mb-3">
+                    <i class="fas fa-shield-exclamation fa-3x text-danger"></i>
+                </div>
+                <h3 style="font-weight: 700; color: #991b1b; margin-bottom: 1.5rem; text-align: center;">Are You Concerned About Your Privacy or Safety?</h3>
+                <p class="text-dark mb-3" style="font-size: 1.1rem; line-height: 1.8; text-align: center;">
+                    If this deepfake video involves you or someone you know, it's important to know your rights and get help.
+                </p>
+                <p class="text-muted mb-4" style="text-align: center;">
+                    Deepfakes can be used for harassment, fraud, or spreading misinformation. There are resources available to help you.
+                </p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="https://www.gov.uk/government/publications/cdei-publishes-its-first-series-of-three-snapshot-papers-ethical-issues-in-ai/snapshot-paper-deepfakes-and-audiovisual-disinformation" target="_blank" class="btn btn-danger btn-lg" style="border-radius: 50px; padding: 1rem 2rem;">
+                        <i class="fas fa-external-link-alt me-2"></i>Get Help & Resources
+                    </a>
+                    <a href="https://www.actionfraud.police.uk/" target="_blank" class="btn btn-outline-danger btn-lg" style="border-radius: 50px; padding: 1rem 2rem;">
+                        <i class="fas fa-flag me-2"></i>Report to Action Fraud UK
+                    </a>
+                </div>
+                <p class="text-muted mt-3 mb-0" style="font-size: 0.9rem; text-align: center;">
+                    <i class="fas fa-info-circle me-1"></i>
+                    You can also contact the police on 101 or report online if you believe a crime has been committed.
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Action Section -->
+    <div class="text-center mt-5 p-5" style="background: linear-gradient(135deg, #f8fafc 0%, #e5e7eb 100%); border-radius: 30px;">
+        <h3 class="mb-4" style="font-weight: 700;">What would you like to do next?</h3>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{% url 'detector:upload' %}" class="btn-modern">
+                <i class="fas fa-plus-circle me-2"></i>Analyze Another Video
+            </a>
+            <a href="{% url 'detector:history' %}" class="btn btn-outline-primary btn-lg" style="border-radius: 50px; padding: 1rem 2rem;">
+                <i class="fas fa-history me-2"></i>View History
+            </a>
+            <button class="btn btn-outline-secondary btn-lg" style="border-radius: 50px; padding: 1rem 2rem;" onclick="shareResults()">
+                <i class="fas fa-share-alt me-2"></i>Share Results
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.finding-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.finding-card:hover .icon-wrapper {
+    transform: scale(1.1);
+}
+
+.icon-wrapper {
+    transition: transform 0.3s ease;
+}
+
+.heatmap-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Disable hover transform effects for specific cards while preserving styling */
+.analysis-card.no-hover {
+    transition: none !important;
+}
+
+.analysis-card.no-hover:hover {
+    transform: none !important;
+}
+</style>
+
+<!-- JavaScript for share and delete functionality -->
+<script>
+    function shareResults() {
+        const shareData = {
+            title: 'VerifAI Detection Result',
+            text: `Video analysis complete: {{ result_text }}`,
+            url: window.location.href
+        };
+        
+        if (navigator.share) {
+            navigator.share(shareData);
+        } else {
+            navigator.clipboard.writeText(window.location.href)
+                .then(() => showToast('Link copied to clipboard!', 'success'));
+        }
+    }
+    
+    function confirmDelete() {
+        // Create a custom confirmation modal
+        const modal = document.createElement('div');
+        modal.innerHTML = `
+            <div class="modal fade" id="deleteModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header border-0">
+                            <h5 class="modal-title text-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
+                            </h5>
+                        </div>
+                        <div class="modal-body">
+                            <p class="mb-3">Are you sure you want to delete this video and its analysis results?</p>
+                            <div class="alert alert-warning">
+                                <small><i class="fas fa-info-circle me-1"></i>
+                                This action cannot be undone. The video file and all associated data will be permanently removed.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="deleteVideo()">
+                                <i class="fas fa-trash me-1"></i>Delete Video
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        deleteModal.show();
+        
+        // Clean up modal after it's hidden
+        document.getElementById('deleteModal').addEventListener('hidden.bs.modal', function() {
+            document.body.removeChild(modal);
+        });
+    }
+    
+    function deleteVideo() {
+        const deleteButton = document.querySelector('#deleteModal .btn-danger');
+        const originalText = deleteButton.innerHTML;
+        
+        // Show loading state
+        deleteButton.disabled = true;
+        deleteButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Deleting...';
+        
+        // Send AJAX request
+        fetch('{% url "detector:delete" video.id %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Hide modal
+                bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+                
+                // Show success message
+                showToast('Video deleted successfully!', 'success');
+                
+                // Redirect after a short delay
+                setTimeout(() => {
+                    window.location.href = data.redirect || '/';
+                }, 1500);
+            } else {
+                throw new Error(data.error || 'Failed to delete video');
+            }
+        })
+        .catch(error => {
+            console.error('Delete error:', error);
+            deleteButton.disabled = false;
+            deleteButton.innerHTML = originalText;
+            
+            showToast('Failed to delete video: ' + error.message, 'error');
+        });
+    }
+    
+    // Toast notification function
+    function showToast(message, type = 'info') {
+        const toastContainer = document.getElementById('toast-container') || createToastContainer();
+        
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'primary'} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        // Remove toast element after it's hidden
+        toast.addEventListener('hidden.bs.toast', function() {
+            toastContainer.removeChild(toast);
+        });
+    }
+    
+    function createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        container.style.zIndex = '11';
+        document.body.appendChild(container);
+        return container;
+    }
+</script>
+
+<!-- Add CSRF token for AJAX requests -->
+{% csrf_token %}
+
+{% endif %}
+{% endblock %}

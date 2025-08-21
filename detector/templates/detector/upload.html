@@ -1,0 +1,308 @@
+<!-- detector/templates/detector/upload.html -->
+{% extends 'detector/base.html' %}
+{% load static %}
+
+{% block title %}Upload Video - VerifAI{% endblock %}
+
+{% block content %}
+<!-- Upload Hero Section -->
+<div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 4rem 0 3rem; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 30% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);"></div>
+    <div class="container text-center position-relative">
+        <h1 class="text-white mb-3" style="font-size: 3rem; font-weight: 800; animation: fade-in-down 0.8s ease-out;">
+            Upload Your Video for Analysis
+        </h1>
+        <p class="text-white" style="font-size: 1.25rem; opacity: 0.9; animation: fade-in-up 0.8s ease-out 0.3s both;">
+            Our AI will analyze your video with 95% accuracy in seconds
+        </p>
+    </div>
+</div>
+
+<div class="container" style="margin-top: 2rem; margin-bottom: 5rem;">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="upload-card" style="position: relative; z-index: 2;">
+                <form method="post" enctype="multipart/form-data" id="upload-form">
+                    {% csrf_token %}
+                    
+                    <!-- Upload Area -->
+                    <div class="upload-area" id="upload-area">
+                        <i class="fas fa-cloud-upload-alt upload-icon fa-5x mb-3"></i>
+                        <h3 class="mb-3">Drag & Drop Your Video Here</h3>
+                        <p class="text-muted mb-4">or click to browse from your device</p>
+                        
+                        <input type="file" name="video_file" id="video-input" 
+                               class="d-none" accept="video/*" required>
+                        
+                        <button type="button" class="btn-modern" 
+                                onclick="document.getElementById('video-input').click()">
+                            <i class="fas fa-folder-open me-2"></i>Choose Video
+                        </button>
+                        
+                        <div class="mt-4 d-flex justify-content-center gap-2 flex-wrap">
+                            <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: var(--primary-color); padding: 0.5rem 1rem; border-radius: 20px;">MP4</span>
+                            <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: var(--primary-color); padding: 0.5rem 1rem; border-radius: 20px;">AVI</span>
+                            <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: var(--primary-color); padding: 0.5rem 1rem; border-radius: 20px;">MOV</span>
+                            <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: var(--primary-color); padding: 0.5rem 1rem; border-radius: 20px;">MKV</span>
+                        </div>
+                        
+                        <p class="text-muted mt-3 mb-0">
+                            <i class="fas fa-shield-check text-success me-2"></i>
+                            Your files are secure • Max size: 500MB
+                        </p>
+                    </div>
+                    
+                    <!-- Video Preview -->
+                    <div id="video-preview" class="video-preview d-none mt-4">
+                        <div style="border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15); position: relative;">
+                            <video id="preview-player" controls width="100%"></video>
+                            <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent); padding: 1.5rem;">
+                                <div class="d-flex justify-content-between align-items-center text-white">
+                                    <div>
+                                        <h5 class="mb-1" id="file-name"></h5>
+                                        <small id="file-size" style="opacity: 0.8;"></small>
+                                    </div>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="resetUpload()">
+                                        <i class="fas fa-times me-1"></i>Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Section -->
+                    <div class="d-none mt-4" id="upload-progress" style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                        <h5 class="mb-3 text-center">
+                            <i class="fas fa-spinner fa-spin me-2 text-primary"></i>
+                            Analyzing Your Video...
+                        </h5>
+                        <div class="progress" style="height: 12px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-3 text-muted">
+                            <span>Processing: <strong id="progress-percent" class="text-primary">0%</strong></span>
+                            <span>Time remaining: <strong id="time-remaining" class="text-primary">Calculating...</strong></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn-modern btn-lg w-100 mt-4" 
+                            id="submit-btn" disabled>
+                        <i class="fas fa-microscope me-2"></i>
+                        <span>Analyze for DeepFakes</span>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Features Grid -->
+            <div class="row g-4 mt-5">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-start">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 1rem;">
+                            <i class="fas fa-lock text-white"></i>
+                        </div>
+                        <div>
+                            <h5>Secure & Private</h5>
+                            <p class="text-muted mb-0">Your videos are automatically deleted after 24 hours</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-start">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 1rem;">
+                            <i class="fas fa-bolt text-white"></i>
+                        </div>
+                        <div>
+                            <h5>Lightning Fast</h5>
+                            <p class="text-muted mb-0">Get results in seconds with our optimized AI pipeline</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tips Section -->
+            <div class="mt-5 p-4" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 20px; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(251, 191, 36, 0.2); border-radius: 50%;"></div>
+                <h5 class="mb-3 position-relative">
+                    <i class="fas fa-lightbulb me-2"></i>Pro Tips for Best Results
+                </h5>
+                <div class="row g-3 position-relative">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-check-circle text-warning me-2 mt-1"></i>
+                            <div>
+                                <strong>High Quality:</strong> Use HD videos (720p+) for better accuracy
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-check-circle text-warning me-2 mt-1"></i>
+                            <div>
+                                <strong>Clear Faces:</strong> Ensure faces are well-lit and visible
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-check-circle text-warning me-2 mt-1"></i>
+                            <div>
+                                <strong>Original Files:</strong> Avoid heavily compressed videos
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-check-circle text-warning me-2 mt-1"></i>
+                            <div>
+                                <strong>Good Length:</strong> 15 to 500 seconds suggested
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes fade-in-down {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.upload-area:hover .upload-icon {
+    animation: bounce 1s ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const uploadArea = document.getElementById('upload-area');
+    const videoInput = document.getElementById('video-input');
+    const videoPreview = document.getElementById('video-preview');
+    const previewPlayer = document.getElementById('preview-player');
+    const submitBtn = document.getElementById('submit-btn');
+
+    // Enhanced drag and drop with visual feedback
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+            uploadArea.classList.add('highlight');
+            uploadArea.style.transform = 'scale(1.02)';
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+            uploadArea.classList.remove('highlight');
+            uploadArea.style.transform = '';
+        }, false);
+    });
+
+    uploadArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const files = e.dataTransfer.files;
+        handleFiles(files);
+    }
+
+    videoInput.addEventListener('change', function(e) {
+        handleFiles(this.files);
+    });
+
+    function handleFiles(files) {
+        if (files.length > 0) {
+            const file = files[0];
+            if (file.type.startsWith('video/')) {
+                displayPreview(file);
+                submitBtn.disabled = false;
+                submitBtn.classList.add('btn-pulse');
+                showToast('Video loaded successfully!', 'success');
+            } else {
+                showToast('Please upload a video file', 'error');
+            }
+        }
+    }
+
+    function displayPreview(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewPlayer.src = e.target.result;
+            uploadArea.classList.add('d-none');
+            videoPreview.classList.remove('d-none');
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('file-size').textContent = formatFileSize(file.size);
+            
+            // Animate preview appearance
+            videoPreview.style.opacity = '0';
+            videoPreview.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                videoPreview.style.transition = 'all 0.5s ease';
+                videoPreview.style.opacity = '1';
+                videoPreview.style.transform = 'translateY(0)';
+            }, 10);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function resetUpload() {
+        uploadArea.classList.remove('d-none');
+        videoPreview.classList.add('d-none');
+        videoInput.value = '';
+        submitBtn.disabled = true;
+        submitBtn.classList.remove('btn-pulse');
+        previewPlayer.src = '';
+    }
+
+    // Form submission - submit immediately without fake progress
+    document.getElementById('upload-form').addEventListener('submit', function(e) {
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
+        
+        // The form will submit immediately and redirect to result page
+        // No fake progress animation that delays submission
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,332 @@
+<!-- detector/templates/detector/about.html -->
+{% extends 'detector/base.html' %}
+{% load static %}
+
+{% block title %}About - VerifAI{% endblock %}
+
+{% block content %}
+<!-- About Hero Section -->
+<div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 5rem 0; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.03"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); animation: float-bg 20s ease-in-out infinite;"></div>
+    <div class="container text-center position-relative">
+        <h1 class="text-white mb-4" style="font-size: 3.5rem; font-weight: 800; animation: fade-in-down 0.8s ease-out;">
+            About VerifAI
+        </h1>
+        <p class="text-white lead" style="font-size: 1.5rem; opacity: 0.9; max-width: 800px; margin: 0 auto; animation: fade-in-up 0.8s ease-out 0.3s both;">
+            Protecting digital authenticity with cutting-edge AI technology
+        </p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="about-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <!-- Mission Section -->
+                <div class="mb-5" style="background: white; padding: 3rem; border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08); transform: translateY(-50px);">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <h3 style="font-weight: 700; color: var(--gray-900); margin-bottom: 1.5rem;">Our Mission</h3>
+                            <p style="font-size: 1.125rem; line-height: 1.8; color: var(--gray-700);">
+                                In an era of rapidly advancing AI technology, distinguishing between authentic and 
+                                manipulated media has become increasingly challenging. Our mission is to provide 
+                                accessible, accurate, and reliable deepfake detection to help combat misinformation 
+                                and protect digital authenticity.
+                            </p>
+                            <p style="font-size: 1.125rem; line-height: 1.8; color: var(--gray-700);">
+                                We believe in a future where technology empowers truth, not deception.
+                            </p>
+                        </div>
+                        <div class="col-lg-4 text-center">
+                            <div style="width: 150px; height: 150px; background: var(--gradient-primary); border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);">
+                                <i class="fas fa-shield-alt text-white" style="font-size: 4rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- How It Works -->
+                <div class="mb-5">
+                    <h3 style="font-weight: 700; color: var(--gray-900); margin-bottom: 2rem; text-align: center;">How Our Technology Works</h3>
+                    <p class="text-center mb-5" style="font-size: 1.125rem; color: var(--gray-600);">
+                        Our deepfake detection system uses state-of-the-art AI to analyze videos
+                    </p>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="tech-feature-card h-100" style="background: linear-gradient(135deg, #f8fafc 0%, white 100%); padding: 2rem; border-radius: 16px; border: 1px solid #e5e7eb; transition: all 0.3s ease;">
+                                <div class="d-flex align-items-start">
+                                    <div style="width: 60px; height: 60px; background: var(--gradient-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 1.5rem;">
+                                        <i class="fas fa-eye text-white fa-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h5 style="font-weight: 600; margin-bottom: 0.75rem;">Facial Analysis</h5>
+                                        <p style="color: var(--gray-600); margin: 0;">Analyzing facial features and expressions to detect inconsistencies and manipulation signs</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="tech-feature-card h-100" style="background: linear-gradient(135deg, #f8fafc 0%, white 100%); padding: 2rem; border-radius: 16px; border: 1px solid #e5e7eb; transition: all 0.3s ease;">
+                                <div class="d-flex align-items-start">
+                                    <div style="width: 60px; height: 60px; background: var(--gradient-secondary); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 1.5rem;">
+                                        <i class="fas fa-brain text-white fa-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h5 style="font-weight: 600; margin-bottom: 0.75rem;">Neural Analysis</h5>
+                                        <p style="color: var(--gray-600); margin: 0;">Deep learning models identify patterns and artifacts typical of deepfake generation</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="tech-feature-card h-100" style="background: linear-gradient(135deg, #f8fafc 0%, white 100%); padding: 2rem; border-radius: 16px; border: 1px solid #e5e7eb; transition: all 0.3s ease;">
+                                <div class="d-flex align-items-start">
+                                    <div style="width: 60px; height: 60px; background: var(--gradient-success); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 1.5rem;">
+                                        <i class="fas fa-film text-white fa-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h5 style="font-weight: 600; margin-bottom: 0.75rem;">Temporal Consistency</h5>
+                                        <p style="color: var(--gray-600); margin: 0;">Analyzing video frame sequences to detect temporal inconsistencies</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="tech-feature-card h-100" style="background: linear-gradient(135deg, #f8fafc 0%, white 100%); padding: 2rem; border-radius: 16px; border: 1px solid #e5e7eb; transition: all 0.3s ease;">
+                                <div class="d-flex align-items-start">
+                                    <div style="width: 60px; height: 60px; background: var(--gradient-danger); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 1.5rem;">
+                                        <i class="fas fa-fingerprint text-white fa-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h5 style="font-weight: 600; margin-bottom: 0.75rem;">Artifact Detection</h5>
+                                        <p style="color: var(--gray-600); margin: 0;">Identifying digital manipulation artifacts and compression anomalies</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Technology Stack -->
+                <div class="mb-5 py-5" style="background: #f8fafc; margin-left: -3rem; margin-right: -3rem; padding-left: 3rem; padding-right: 3rem; border-radius: 30px;">
+                    <h3 style="font-weight: 700; color: var(--gray-900); margin-bottom: 1rem; text-align: center;">Technology Stack</h3>
+                    <p class="text-center mb-5" style="font-size: 1.125rem; color: var(--gray-600); max-width: 600px; margin-left: auto; margin-right: auto;">
+                        Built with cutting-edge technologies for maximum performance and reliability
+                    </p>
+                    <div class="tech-grid">
+                        <div class="tech-item">
+                            <i class="fab fa-python"></i>
+                            <p>Python</p>
+                        </div>
+                        <div class="tech-item">
+                            <i class="fab fa-meta"></i>
+                            <p>Meta</p>
+                        </div>
+                        <div class="tech-item">
+                            <i class="fas fa-project-diagram"></i>
+                            <p>PyTorch</p>
+                        </div>
+                        <div class="tech-item">
+                            <i class="fab fa-python"></i>
+                            <p>Django</p>
+                        </div>
+                        <div class="tech-item">
+                            <i class="fas fa-image"></i>
+                            <p>OpenCV</p>
+                        </div>
+                        <div class="tech-item">
+                            <i class="fab fa-docker"></i>
+                            <p>Docker</p>
+                        </div>
+                        <div class="tech-item">
+                            <i class="fas fa-memory"></i>
+                            <p>NVIDIA</p>
+                        </div>
+                        <div class="tech-item">
+                            <i class="fas fa-chart-line"></i>
+                            <p>Analytics</p>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                <!-- CTA -->
+                <div class="text-center mt-5 p-5" style="background: var(--gradient-primary); border-radius: 30px; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: -100px; right: -100px; width: 300px; height: 300px; background: rgba(255, 255, 255, 0.1); border-radius: 50%;"></div>
+                    <h3 class="text-white mb-4 position-relative" style="font-weight: 700;">Ready to Verify Your Videos?</h3>
+                    <p class="text-white mb-4 position-relative" style="font-size: 1.25rem; opacity: 0.9;">Start analyzing your videos with our advanced AI technology.</p>
+                    <a href="{% url 'detector:upload' %}" class="btn btn-light btn-lg position-relative" style="border-radius: 50px; padding: 1rem 3rem; font-weight: 600; color: var(--primary-color);">
+                        <i class="fas fa-upload me-2"></i>Upload Video Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes fade-in-down {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float-bg {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(30px, 30px); }
+}
+
+.tech-feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card h2 {
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover h2 {
+    transform: scale(1.1);
+}
+
+/* Tech Stack Grid - Ensure separated cards */
+.tech-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 2rem !important;
+    padding: 0 !important;
+}
+
+.tech-item {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 20px !important;
+    padding: 2.5rem 1.5rem !important;
+    text-align: center !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08) !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.tech-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+}
+
+.tech-item:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15) !important;
+    border-color: transparent !important;
+}
+
+.tech-item:hover::before {
+    opacity: 1;
+}
+
+.tech-item i,
+.tech-item svg,
+.tech-item p {
+    position: relative;
+    z-index: 1;
+    transition: color 0.3s ease;
+}
+
+.tech-item:hover i,
+.tech-item:hover svg,
+.tech-item:hover p {
+    color: white !important;
+    fill: white !important;
+}
+
+/* Enhanced Tech Grid Styling */
+@media (max-width: 992px) {
+    .tech-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .tech-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1.5rem !important;
+    }
+    
+    .tech-item {
+        padding: 2rem 1rem !important;
+    }
+    
+    .tech-item i {
+        font-size: 2.5rem;
+    }
+    
+    .tech-item p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .tech-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem !important;
+    }
+}
+
+/* Add stagger animation for tech items */
+.tech-item {
+    opacity: 0;
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.tech-item:nth-child(1) { animation-delay: 0.1s; }
+.tech-item:nth-child(2) { animation-delay: 0.2s; }
+.tech-item:nth-child(3) { animation-delay: 0.3s; }
+.tech-item:nth-child(4) { animation-delay: 0.4s; }
+.tech-item:nth-child(5) { animation-delay: 0.5s; }
+.tech-item:nth-child(6) { animation-delay: 0.6s; }
+.tech-item:nth-child(7) { animation-delay: 0.7s; }
+.tech-item:nth-child(8) { animation-delay: 0.8s; }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,680 @@
+<!-- detector/templates/detector/history.html -->
+{% extends 'detector/base.html' %}
+{% load static %}
+
+{% block title %}Analysis History - VerifAI{% endblock %}
+
+{% block content %}
+<!-- History Hero Section -->
+<div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 4rem 0 3rem; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 30% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);"></div>
+    <div class="container text-center position-relative">
+        <h1 class="text-white mb-3" style="font-size: 3rem; font-weight: 800; animation: fade-in-down 0.8s ease-out;">
+            Analysis History
+        </h1>
+        <p class="text-white" style="font-size: 1.25rem; opacity: 0.9; animation: fade-in-up 0.8s ease-out 0.3s both;">
+            View your recent deepfake detection results
+        </p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container" style="margin-top: 2rem; margin-bottom: 5rem;">
+    
+    {% if videos %}
+    <!-- Control Panel -->
+    <div class="row mb-4">
+        <!-- Selection Controls -->
+        <div class="col-md-3">
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleSelectionMode()" id="selectionToggle">
+                    <i class="fas fa-check-square me-1"></i>Select
+                </button>
+                <button type="button" class="btn btn-danger btn-sm d-none" onclick="bulkDelete()" id="bulkDeleteBtn">
+                    <i class="fas fa-trash me-1"></i>Delete Selected (<span id="selectedCount">0</span>)
+                </button>
+            </div>
+        </div>
+        
+        <!-- Filter Buttons (Centered) -->
+        <div class="col-md-6 text-center">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary active" onclick="filterVideos('all', this)">
+                    <i class="fas fa-list me-2"></i>All Videos
+                </button>
+                <button type="button" class="btn btn-outline-success" onclick="filterVideos('authentic', this)">
+                    <i class="fas fa-check-circle me-2"></i>Authentic
+                </button>
+                <button type="button" class="btn btn-outline-danger" onclick="filterVideos('deepfake', this)">
+                    <i class="fas fa-times-circle me-2"></i>Deepfakes
+                </button>
+            </div>
+        </div>
+        
+        <!-- Empty space for balance -->
+        <div class="col-md-3">
+        </div>
+    </div>
+    
+    <!-- Video Grid -->
+    <div class="row g-4" id="video-grid">
+        {% for video in videos %}
+        <div class="col-md-6 col-lg-4 video-item" data-type="{% if video.result.is_deepfake %}deepfake{% else %}authentic{% endif %}" data-video-id="{{ video.id }}">
+            <div class="history-card" style="background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 2px 40px rgba(0, 0, 0, 0.06); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(0, 0, 0, 0.04);">
+                <!-- Selection Checkbox (hidden by default) -->
+                <div class="selection-checkbox d-none" style="position: absolute; top: 1rem; right: 1rem; z-index: 10;">
+                    <input type="checkbox" class="form-check-input video-select" value="{{ video.id }}" style="width: 1.5rem; height: 1.5rem; cursor: pointer;">
+                </div>
+                
+                <!-- Video Thumbnail -->
+                <div class="video-preview" style="position: relative; height: 240px; background: #000; overflow: hidden;">
+                    <video style="width: 100%; height: 100%; object-fit: cover;" muted>
+                        <source src="{{ video.video_file.url }}" type="video/mp4">
+                    </video>
+                    
+                    <!-- Gradient Overlay -->
+                    <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 0%, transparent 50%, rgba(0,0,0,0.8) 100%);"></div>
+                    
+                    <!-- Top Status Badge -->
+                    <div style="position: absolute; top: 1.5rem; left: 1.5rem;">
+                        <span class="badge {% if video.result.is_deepfake %}bg-danger{% else %}bg-success{% endif %}" style="padding: 0.75rem 1.25rem; font-size: 0.875rem; font-weight: 600; backdrop-filter: blur(10px); background: {% if video.result.is_deepfake %}rgba(239, 68, 68, 0.9){% else %}rgba(16, 185, 129, 0.9){% endif %};">
+                            {% if video.result.is_deepfake %}
+                                <i class="fas fa-exclamation-triangle me-1"></i>Deepfake Detected
+                            {% else %}
+                                <i class="fas fa-check-circle me-1"></i>Verified Authentic
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <!-- Bottom Info -->
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 2rem 1.5rem 1.5rem; z-index: 2;">
+                        <div class="d-flex justify-content-between align-items-end">
+                            <div>
+                                <div class="text-white mb-1" style="font-size: 0.875rem; opacity: 0.9;">
+                                    <i class="fas fa-calendar-alt me-1"></i>{{ video.uploaded_at|date:"F d, Y" }}
+                                </div>
+                                <div class="text-white" style="font-size: 0.875rem; opacity: 0.9;">
+                                    <i class="fas fa-clock me-1"></i>{{ video.uploaded_at|time:"g:i A" }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card Actions -->
+                <div class="p-4">
+                    <div class="d-flex gap-3 card-actions">
+                        <a href="{% url 'detector:result' video.id %}" class="btn btn-primary flex-fill" style="padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 500;">
+                            <i class="fas fa-chart-line me-2"></i>View Analysis
+                        </a>
+                        <button class="btn btn-light" style="padding: 0.75rem 1.25rem; border-radius: 12px; border: 1px solid #e5e7eb;" onclick="shareResult('{{ video.id }}')">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-single-delete d-none" style="padding: 0.75rem 1.25rem; border-radius: 12px;" onclick="deleteSingleVideo('{{ video.id }}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+        <div class="empty-state" style="max-width: 500px; margin: 0 auto;">
+            <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+                <i class="fas fa-inbox fa-3x text-muted"></i>
+            </div>
+            <h3 class="mb-3">No Analysis History Yet</h3>
+            <p class="text-muted mb-4">Start analyzing videos to see your detection history here</p>
+            <a href="{% url 'detector:upload' %}" class="btn-modern">
+                <i class="fas fa-upload me-2"></i>Upload Your First Video
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.history-card {
+    position: relative;
+}
+
+.history-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12) !important;
+}
+
+.history-card video {
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.history-card:hover video {
+    transform: scale(1.08);
+}
+
+/* Filter Animation */
+.video-item {
+    transition: all 0.5s ease;
+}
+
+.video-item.hidden {
+    opacity: 0;
+    transform: scale(0.8);
+    display: none;
+}
+
+/* Button Group */
+.btn-group .btn {
+    border-radius: 50px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-group .btn:not(:last-child) {
+    border-right: 1px solid #dee2e6;
+}
+
+.btn-group .btn.active {
+    transform: scale(1.05);
+    z-index: 1;
+}
+
+/* Selection styles */
+.history-card.selected {
+    border: 2px solid #0d6efd !important;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25) !important;
+    transform: translateY(-2px);
+}
+
+.selection-checkbox {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    padding: 4px;
+    backdrop-filter: blur(10px);
+}
+
+.selection-checkbox input[type="checkbox"] {
+    background-color: white;
+    border: 2px solid #dee2e6;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.selection-checkbox input[type="checkbox"]:checked {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e") !important;
+}
+
+.selection-checkbox input[type="checkbox"]:hover {
+    border-color: #0d6efd;
+    transform: scale(1.1);
+}
+
+.btn-single-delete {
+    transition: all 0.3s ease;
+}
+
+/* Animation keyframes */
+@keyframes fade-in-down {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let selectionMode = false;
+    let selectedVideos = new Set();
+    
+    // Video hover play
+    document.querySelectorAll('.history-card').forEach(card => {
+        const video = card.querySelector('video');
+        
+        card.addEventListener('mouseenter', () => {
+            if (!selectionMode) {
+                video.play();
+            }
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            video.pause();
+            video.currentTime = 0;
+        });
+    });
+    
+    // Filter functionality
+    function filterVideos(type, buttonElement) {
+        const buttons = document.querySelectorAll('.btn-group .btn');
+        const videoItems = document.querySelectorAll('.video-item');
+        
+        // Update active button
+        buttons.forEach(btn => btn.classList.remove('active'));
+        buttonElement.classList.add('active');
+        
+        // Filter videos
+        videoItems.forEach((item, index) => {
+            setTimeout(() => {
+                if (type === 'all' || item.dataset.type === type) {
+                    item.classList.remove('hidden');
+                    item.style.display = '';
+                } else {
+                    item.classList.add('hidden');
+                    setTimeout(() => {
+                        if (item.classList.contains('hidden')) {
+                            item.style.display = 'none';
+                        }
+                    }, 500);
+                }
+            }, index * 50);
+        });
+    }
+    
+    // Toggle selection mode
+    function toggleSelectionMode() {
+        selectionMode = !selectionMode;
+        const toggleBtn = document.getElementById('selectionToggle');
+        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+        const checkboxes = document.querySelectorAll('.selection-checkbox');
+        const singleDeleteBtns = document.querySelectorAll('.btn-single-delete');
+        
+        if (selectionMode) {
+            // Enter selection mode
+            toggleBtn.innerHTML = '<i class="fas fa-times me-1"></i>Cancel';
+            toggleBtn.classList.remove('btn-outline-secondary');
+            toggleBtn.classList.add('btn-secondary');
+            
+            // Show checkboxes and delete buttons
+            checkboxes.forEach(cb => cb.classList.remove('d-none'));
+            singleDeleteBtns.forEach(btn => btn.classList.remove('d-none'));
+            
+            // Add click handlers to cards for selection
+            document.querySelectorAll('.history-card').forEach(card => {
+                card.style.cursor = 'pointer';
+                card.onclick = handleCardClick;
+            });
+            
+            // Show bulk delete button if selections exist
+            updateBulkDeleteButton();
+        } else {
+            // Exit selection mode
+            toggleBtn.innerHTML = '<i class="fas fa-check-square me-1"></i>Select';
+            toggleBtn.classList.remove('btn-secondary');
+            toggleBtn.classList.add('btn-outline-secondary');
+            
+            // Hide checkboxes and delete buttons
+            checkboxes.forEach(cb => cb.classList.add('d-none'));
+            singleDeleteBtns.forEach(btn => btn.classList.add('d-none'));
+            bulkDeleteBtn.classList.add('d-none');
+            
+            // Remove click handlers and clear selections
+            document.querySelectorAll('.history-card').forEach(card => {
+                card.style.cursor = '';
+                card.classList.remove('selected');
+                card.onclick = null;
+            });
+            
+            // Clear checkboxes
+            document.querySelectorAll('.video-select').forEach(cb => cb.checked = false);
+            selectedVideos.clear();
+        }
+    }
+    
+    // Handle card click in selection mode
+    function handleCardClick(event) {
+        if (!selectionMode) return;
+        
+        // Don't handle if clicking on buttons or links
+        if (event.target.closest('a, button')) {
+            return;
+        }
+        
+        // Prevent default link behavior
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const card = event.currentTarget;
+        const checkbox = card.querySelector('.video-select');
+        const videoId = card.closest('.video-item').dataset.videoId;
+        
+        // Toggle selection
+        checkbox.checked = !checkbox.checked;
+        
+        if (checkbox.checked) {
+            selectedVideos.add(videoId);
+            card.classList.add('selected');
+        } else {
+            selectedVideos.delete(videoId);
+            card.classList.remove('selected');
+        }
+        
+        updateBulkDeleteButton();
+    }
+    
+    // Update bulk delete button visibility and count
+    function updateBulkDeleteButton() {
+        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+        const selectedCount = document.getElementById('selectedCount');
+        
+        selectedCount.textContent = selectedVideos.size;
+        
+        if (selectedVideos.size > 0) {
+            bulkDeleteBtn.classList.remove('d-none');
+        } else {
+            bulkDeleteBtn.classList.add('d-none');
+        }
+    }
+    
+    // Bulk delete function
+    function bulkDelete() {
+        if (selectedVideos.size === 0) return;
+        
+        const modal = document.createElement('div');
+        modal.innerHTML = `
+            <div class="modal fade" id="bulkDeleteModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header border-0">
+                            <h5 class="modal-title text-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Confirm Bulk Deletion
+                            </h5>
+                        </div>
+                        <div class="modal-body">
+                            <p class="mb-3">Are you sure you want to delete <strong>${selectedVideos.size}</strong> video${selectedVideos.size > 1 ? 's' : ''} and their analysis results?</p>
+                            <div class="alert alert-danger">
+                                <small><i class="fas fa-warning me-1"></i>
+                                This action cannot be undone. All selected videos and their associated data will be permanently removed.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="executeBulkDelete()">
+                                <i class="fas fa-trash me-1"></i>Delete ${selectedVideos.size} Video${selectedVideos.size > 1 ? 's' : ''}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        const deleteModal = new bootstrap.Modal(document.getElementById('bulkDeleteModal'));
+        deleteModal.show();
+        
+        // Clean up modal after it's hidden
+        document.getElementById('bulkDeleteModal').addEventListener('hidden.bs.modal', function() {
+            document.body.removeChild(modal);
+        });
+    }
+    
+    // Execute bulk delete
+    function executeBulkDelete() {
+        const deleteButton = document.querySelector('#bulkDeleteModal .btn-danger');
+        const originalText = deleteButton.innerHTML;
+        
+        // Show loading state
+        deleteButton.disabled = true;
+        deleteButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Deleting...';
+        
+        // Convert Set to Array
+        const videoIds = Array.from(selectedVideos);
+        
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                         getCookie('csrftoken');
+        
+        // Send AJAX request
+        fetch('{% url "detector:bulk_delete" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ video_ids: videoIds })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Hide modal
+                bootstrap.Modal.getInstance(document.getElementById('bulkDeleteModal')).hide();
+                
+                // Show success message
+                showToast(`Successfully deleted ${data.deleted_count} video${data.deleted_count > 1 ? 's' : ''}!`, 'success');
+                
+                // Remove deleted cards from DOM
+                videoIds.forEach(videoId => {
+                    const videoItem = document.querySelector(`[data-video-id="${videoId}"]`);
+                    if (videoItem) {
+                        videoItem.style.transition = 'all 0.5s ease';
+                        videoItem.style.opacity = '0';
+                        videoItem.style.transform = 'scale(0.8)';
+                        setTimeout(() => videoItem.remove(), 500);
+                    }
+                });
+                
+                // Reset selection mode
+                setTimeout(() => {
+                    selectedVideos.clear();
+                    updateBulkDeleteButton();
+                    
+                    // Check if no videos left
+                    const remainingVideos = document.querySelectorAll('.video-item:not([style*="opacity: 0"])');
+                    if (remainingVideos.length === 0) {
+                        setTimeout(() => location.reload(), 1000);
+                    }
+                }, 500);
+                
+            } else {
+                throw new Error(data.error || 'Failed to delete videos');
+            }
+        })
+        .catch(error => {
+            console.error('Bulk delete error:', error);
+            deleteButton.disabled = false;
+            deleteButton.innerHTML = originalText;
+            
+            showToast('Failed to delete videos: ' + error.message, 'error');
+        });
+    }
+    
+    // Single video delete
+    function deleteSingleVideo(videoId) {
+        // Use the same confirmation modal as single delete, but for this specific video
+        const modal = document.createElement('div');
+        modal.innerHTML = `
+            <div class="modal fade" id="singleDeleteModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header border-0">
+                            <h5 class="modal-title text-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
+                            </h5>
+                        </div>
+                        <div class="modal-body">
+                            <p class="mb-3">Are you sure you want to delete this video and its analysis results?</p>
+                            <div class="alert alert-warning">
+                                <small><i class="fas fa-info-circle me-1"></i>
+                                This action cannot be undone. The video file and all associated data will be permanently removed.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="executeSingleDelete('${videoId}')">
+                                <i class="fas fa-trash me-1"></i>Delete Video
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        const deleteModal = new bootstrap.Modal(document.getElementById('singleDeleteModal'));
+        deleteModal.show();
+        
+        // Clean up modal after it's hidden
+        document.getElementById('singleDeleteModal').addEventListener('hidden.bs.modal', function() {
+            document.body.removeChild(modal);
+        });
+    }
+    
+    // Execute single delete
+    function executeSingleDelete(videoId) {
+        const deleteButton = document.querySelector('#singleDeleteModal .btn-danger');
+        const originalText = deleteButton.innerHTML;
+        
+        // Show loading state
+        deleteButton.disabled = true;
+        deleteButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Deleting...';
+        
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                         getCookie('csrftoken');
+        
+        // Send AJAX request
+        fetch(`/delete/${videoId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Hide modal
+                bootstrap.Modal.getInstance(document.getElementById('singleDeleteModal')).hide();
+                
+                // Show success message
+                showToast('Video deleted successfully!', 'success');
+                
+                // Remove card from DOM
+                const videoItem = document.querySelector(`[data-video-id="${videoId}"]`);
+                if (videoItem) {
+                    videoItem.style.transition = 'all 0.5s ease';
+                    videoItem.style.opacity = '0';
+                    videoItem.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        videoItem.remove();
+                        
+                        // Check if no videos left
+                        const remainingVideos = document.querySelectorAll('.video-item');
+                        if (remainingVideos.length === 0) {
+                            setTimeout(() => location.reload(), 1000);
+                        }
+                    }, 500);
+                }
+                
+            } else {
+                throw new Error(data.error || 'Failed to delete video');
+            }
+        })
+        .catch(error => {
+            console.error('Delete error:', error);
+            deleteButton.disabled = false;
+            deleteButton.innerHTML = originalText;
+            
+            showToast('Failed to delete video: ' + error.message, 'error');
+        });
+    }
+    
+    // Share functionality
+    function shareResult(videoId) {
+        const url = window.location.origin + `/result/${videoId}/`;
+        if (navigator.share) {
+            navigator.share({
+                title: 'VerifAI Detection Result',
+                text: 'Check out this video analysis result',
+                url: url
+            });
+        } else {
+            navigator.clipboard.writeText(url)
+                .then(() => showToast('Link copied to clipboard!', 'success'));
+        }
+    }
+    
+    // Toast notification function
+    function showToast(message, type = 'info') {
+        const toastContainer = document.getElementById('toast-container') || createToastContainer();
+        
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'primary'} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        // Remove toast element after it's hidden
+        toast.addEventListener('hidden.bs.toast', function() {
+            toastContainer.removeChild(toast);
+        });
+    }
+    
+    function createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        container.style.zIndex = '11';
+        document.body.appendChild(container);
+        return container;
+    }
+    
+    // Helper function to get CSRF cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+<!-- Add CSRF token for AJAX requests -->
+{% csrf_token %}
+{% endblock %}
