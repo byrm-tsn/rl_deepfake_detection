@@ -44,7 +44,7 @@ If you want to read my report, you can find it
 
 ### Prerequisites
 
-- **Python 3.8+**
+- **Python 3.10+**
 - **Django 4.2+**
 - **PyTorch 2.0+**
 - **TorchRL**
