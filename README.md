@@ -30,7 +30,7 @@ https://github.com/user-attachments/assets/12063873-db85-49fc-8e0b-eb6f60f00c14
 
 ## Documentation
 
-If you want to read my report, you can find it 
+If you want to read my report, you can find my dissertation paper [here](https://github.com/byrm-tsn/rl_deepfake_detection/blob/main/DOCUMENTATION/Dissertation_Paper.pdf) and the reflective essay [here](https://github.com/byrm-tsn/rl_deepfake_detection/blob/main/DOCUMENTATION/Reflective%20Essay.pdf).
 
 ## Usage
 
