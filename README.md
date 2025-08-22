@@ -11,7 +11,13 @@ Watch the demo video below to see the application in action:
 
 https://github.com/user-attachments/assets/12063873-db85-49fc-8e0b-eb6f60f00c14
 
+## Model Architecture
 
+- **Feature Extraction**: DINOv3 Vision Transformer (ViT-B/16)
+- **Temporal Processing**: Bidirectional LSTM (3 layers, 512 hidden units)
+- **Decision Making**: Reinforcement Learning Agent with PPO and GRPO
+- **Uncertainty Estimation**: Bayesian inference via Monte Carlo Dropout
+  
 ## Features
 
 - **Intelligent Frame Selection**: Reinforcement learning agent analyzes only essential frames, reducing processing time to 10 seconds per video
@@ -29,22 +35,16 @@ If you want to read my report, you can find it
 ## Usage
 
 - **Upload a video file through the web interface**
-- **Wait for processing (approximately 10 seconds)**
-- **View detection results with confidence scores**
+- **Wait for processing (approximately 10-15 seconds)**
+- **View detection results**
 - **Examine DINOv3 attention heatmaps showing detection reasoning**
 
-## Model Architecture
-
-- **Feature Extraction**: DINOv3 Vision Transformer (ViT-B/16)
-- **Temporal Processing**: Bidirectional LSTM (3 layers, 512 hidden units)
-- **Decision Making**: Reinforcement Learning Agent with PPO and GRPO
-- **Uncertainty Estimation**: Bayesian inference via Monte Carlo Dropout
 
 ## Installation
 
 ### Prerequisites
 
-- **Python 3.8+**
+- **Python 3.10+**
 - **Django 4.2+**
 - **PyTorch 2.0+**
 - **TorchRL**
@@ -55,4 +55,11 @@ If you want to read my report, you can find it
 
 [![My Skills](https://skillicons.dev/icons?i=vscode,github,django,js,html,css,git,opencv,py,sqlite,pytorch,sklearn)](https://skillicons.dev)
 
+## Clone the Repository
+### You should train the model with the dataset you have, the model and dataset are not avaibale in the repository!)
+```bash
+git clone https://https://github.com/byrm-tsn/rl_deepfake_detection
+cd rl_deepdake_detection
+pip install -r requirements.txt
+python manage.py runserver
 
